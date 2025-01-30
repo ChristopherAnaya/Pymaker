@@ -6,9 +6,15 @@ import objects
 pygame.init()
 clock = pygame.time.Clock()
 
+screen_info = pygame.display.Info()
+screen_width, screen_height = screen_info.current_w, screen_info.current_h
 screen_size = (1920, 1080) 
-default_screen_size = (screen_size[0] * .9, screen_size[1] * .9)
+offset = screen_width / screen_size[0]
+print(offset)
+
+default_screen_size = (screen_size[0] * .9 * offset, screen_size[1] * .9 * offset)
 screen = pygame.display.set_mode(default_screen_size)
+
 #1728, 972
 running = True
 fullscreen = False
@@ -47,7 +53,7 @@ current_Grid[5][19] = "brick"
 grid_Blocks = []
 current_Row = 0
 current_Column = 0
-grid_Size = 40
+grid_Size = 40 * offset
 for x in current_Grid:
     current_Column = 0
     row_Add = []
@@ -77,17 +83,12 @@ while running:
         
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1: 
+                mouse_Scalling = int(grid_Size)
                 mouse_Column, mouse_Row = event.pos  
-                print(f"Mouse clicked at: ({mouse_Column//40}, {mouse_Row//40})")
-                grid_Blocks[mouse_Row//40][mouse_Column//40] = objects.block("brick", 40, mouse_Column//40*40, mouse_Row//40*40)
-
+                print(f"Mouse clicked at: ({mouse_Column//mouse_Scalling}, {mouse_Row//mouse_Scalling})")
+                grid_Blocks[mouse_Row//mouse_Scalling][mouse_Column//mouse_Scalling] = objects.block("brick", mouse_Scalling, mouse_Column//mouse_Scalling*mouse_Scalling, mouse_Row//mouse_Scalling*mouse_Scalling)
 
     screen.fill((255, 255, 255))
-
-    
-    
-
-
 
     # Create Grid
     for row in range(tilesHeight):
