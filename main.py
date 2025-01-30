@@ -23,7 +23,7 @@ def create_Empty_Grid():
     for x in range(tilesHeight):
         current = []
         for y in range(tilesWide):
-            current.append("brick")
+            current.append("empty")
         grid.append(current)  
     return grid  
 
@@ -43,30 +43,20 @@ current_Grid[9][29] = "brick"
 current_Grid[9][9] = "brick"
 current_Grid[5][19] = "brick"
 
-class player:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y  
-        self.width = 50
-        self.height = 50
-        self.color = (0, 0, 255)
-        self.speed = 5
-
-    def move(self, keys):
-        if keys[pygame.K_LEFT]:
-            self.x -= self.speed
-        if keys[pygame.K_RIGHT]:
-            self.x += self.speed
-        if keys[pygame.K_UP]:
-            self.y -= self.speed
-        if keys[pygame.K_DOWN]:
-            self.y += self.speed
-
-    def draw(self, screen):
-        pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height))
-
-player_obj = player(375, 275)
-
+#turn the grid into objects
+grid_Blocks = []
+current_Row = 0
+current_Column = 0
+grid_Size = 40
+for x in current_Grid:
+    current_Column = 0
+    row_Add = []
+    for y in x:
+        current_Object = objects.block(y, grid_Size, current_Column*grid_Size, current_Row*grid_Size)
+        row_Add.append([current_Object[0], current_Object[1]])
+        current_Column += 1
+    grid_Blocks.append(row_Add)
+    current_Row += 1
 
 # Main Loop
 while running:
@@ -84,26 +74,25 @@ while running:
                 screen = pygame.display.set_mode(screen_size, pygame.FULLSCREEN | pygame.NOFRAME)
             else:
                 screen = pygame.display.set_mode(default_screen_size, pygame.RESIZABLE)"""
+        
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1: 
+                mouse_Column, mouse_Row = event.pos  
+                print(f"Mouse clicked at: ({mouse_Column//40}, {mouse_Row//40})")
+                grid_Blocks[mouse_Row//40][mouse_Column//40] = objects.block("brick", 40, mouse_Column//40*40, mouse_Row//40*40)
 
-    screen.fill((0, 0, 0))
 
-    # Player Logic
-    keys = pygame.key.get_pressed()
-    player_obj.move(keys)
-    player_obj.draw(screen)
+    screen.fill((255, 255, 255))
+
+    
+    
+
+
 
     # Create Grid
-    current_Row = 0
-    current_Column = 0
-    grid_Size = 40
-    for x in current_Grid:
-        current_Column = 0
-        for y in x:
-            if y == "brick":
-                current_Object = objects.block(y, grid_Size, current_Column*grid_Size, current_Row*grid_Size)
-                screen.blit(current_Object[0], current_Object[1])
-            current_Column += 1
-        current_Row += 1
+    for row in range(tilesHeight):
+        for col in range(tilesWide):
+            screen.blit(grid_Blocks[row][col][0], grid_Blocks[row][col][1])
 
     # Update Screen
     pygame.display.flip()
