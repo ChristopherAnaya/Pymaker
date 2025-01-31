@@ -12,9 +12,12 @@ screen_size = (1920, 1080)
 offset = screen_width / screen_size[0]
 print(offset)
 
-default_screen_size = (screen_size[0] * .9 * offset, screen_size[1] * .9 * offset)
-screen = pygame.display.set_mode(default_screen_size)
+# Set The Grid Size
+grid_Size = 40 * offset
 
+default_screen_size = (int((screen_size[0] * .9 * offset) - (screen_size[0] * .9 * offset)%40), int(screen_size[1] * .9 * offset))
+screen = pygame.display.set_mode(default_screen_size)
+print(default_screen_size)
 #1728, 972
 running = True
 fullscreen = False
@@ -44,12 +47,12 @@ def load_grid(filename):
         return json.load(file)
 
 current_Grid = create_Empty_Grid()
+current_Grid[0][299] = "red"
 
 #Turn The Grid Into Objects
 grid_Blocks = []
 current_Row = 0
 current_Column = 0
-grid_Size = 40 * offset
 for x in current_Grid:
     current_Column = 0
     row_Add = []
@@ -62,8 +65,11 @@ for x in current_Grid:
 
 # Sets Up The Camera
 camera_x = 0
-camera_speed = int(20 * offset)
+camera_speed = int(40 * offset)
 keys = {"left": False, "right":False}
+
+# Sets Up The Hotbar
+hotbar = objects.hotbar(offset, default_screen_size[0], default_screen_size[1])
 
 # Main Loop
 while running:
@@ -76,14 +82,6 @@ while running:
         # Check for Quit
         if event.type == pygame.QUIT:
             running = False
-
-        # Check for Fullscreen 
-        """if event.type == pygame.KEYDOWN and event.key == pygame.K_F11:
-            fullscreen = not fullscreen
-            if fullscreen:
-                screen = pygame.display.set_mode(screen_size, pygame.FULLSCREEN | pygame.NOFRAME)
-            else:
-                screen = pygame.display.set_mode(default_screen_size, pygame.RESIZABLE)"""
         
         # Check To See If User Clicked
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -92,7 +90,7 @@ while running:
                 mouse_Column, mouse_Row = event.pos  
                 mouse_Column += camera_x
                 print(f"Mouse clicked at: ({mouse_Column//mouse_Scalling}, {mouse_Row//mouse_Scalling})")
-                grid_Blocks[mouse_Row//mouse_Scalling][mouse_Column//mouse_Scalling] = objects.block("brick", mouse_Scalling, mouse_Column//mouse_Scalling*mouse_Scalling, mouse_Row//mouse_Scalling*mouse_Scalling)
+                grid_Blocks[mouse_Row//mouse_Scalling][mouse_Column//mouse_Scalling] = objects.block("red", mouse_Scalling, mouse_Column//mouse_Scalling*mouse_Scalling, mouse_Row//mouse_Scalling*mouse_Scalling)
 
         # Ajust the camera
         if event.type == pygame.KEYDOWN:
@@ -113,6 +111,11 @@ while running:
             screen.blit(grid_Blocks[row][col][0], 
             (grid_Blocks[row][col][1].x - camera_x, grid_Blocks[row][col][1].y))
 
+    # Creates The Hotbar
+    for item in hotbar:
+        screen.blit(item, hotbar[item])
+        pygame.draw.rect(screen, (80, 80, 80), hotbar[item], 5)
+
     # Moves The Camera
     if keys["left"] and keys["right"]:
         continue
@@ -122,7 +125,10 @@ while running:
         elif camera_x < camera_speed and camera_x > 0:
             camera_x = 0
     elif keys["right"]:
-        camera_x += camera_speed
+        if camera_x <= (tilesWide * grid_Size) -  default_screen_size[0] - camera_speed:
+            camera_x += camera_speed
+        elif camera_x > (tilesWide * grid_Size) - default_screen_size[0] - camera_speed and camera_x < (tilesWide * grid_Size) -  default_screen_size[0]:
+            camera_x = (tilesWide * grid_Size) -  default_screen_size[0]
 
     # Update Screen
     pygame.display.flip()
