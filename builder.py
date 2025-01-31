@@ -44,12 +44,8 @@ def load_grid(filename):
         return json.load(file)
 
 current_Grid = create_Empty_Grid()
-current_Grid[0][0] = "brick"
-current_Grid[9][29] = "brick"
-current_Grid[9][9] = "brick"
-current_Grid[5][19] = "brick"
 
-#turn the grid into objects
+#Turn The Grid Into Objects
 grid_Blocks = []
 current_Row = 0
 current_Column = 0
@@ -64,9 +60,17 @@ for x in current_Grid:
     grid_Blocks.append(row_Add)
     current_Row += 1
 
+# Sets Up The Camera
+camera_x = 0
+camera_speed = int(20 * offset)
+keys = {"left": False, "right":False}
+
 # Main Loop
 while running:
     
+    screen.fill((255, 255, 255))
+
+    # Check For Inputs
     for event in pygame.event.get():
         
         # Check for Quit
@@ -81,19 +85,44 @@ while running:
             else:
                 screen = pygame.display.set_mode(default_screen_size, pygame.RESIZABLE)"""
         
+        # Check To See If User Clicked
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1: 
                 mouse_Scalling = int(grid_Size)
                 mouse_Column, mouse_Row = event.pos  
+                mouse_Column += camera_x
                 print(f"Mouse clicked at: ({mouse_Column//mouse_Scalling}, {mouse_Row//mouse_Scalling})")
                 grid_Blocks[mouse_Row//mouse_Scalling][mouse_Column//mouse_Scalling] = objects.block("brick", mouse_Scalling, mouse_Column//mouse_Scalling*mouse_Scalling, mouse_Row//mouse_Scalling*mouse_Scalling)
 
-    screen.fill((255, 255, 255))
+        # Ajust the camera
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                keys["left"] = True
+            elif event.key == pygame.K_RIGHT:
+                keys["right"] = True
+        
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT:
+                keys["left"] = False
+            elif event.key == pygame.K_RIGHT:
+                keys["right"] = False
 
     # Create Grid
     for row in range(tilesHeight):
         for col in range(tilesWide):
-            screen.blit(grid_Blocks[row][col][0], grid_Blocks[row][col][1])
+            screen.blit(grid_Blocks[row][col][0], 
+            (grid_Blocks[row][col][1].x - camera_x, grid_Blocks[row][col][1].y))
+
+    # Moves The Camera
+    if keys["left"] and keys["right"]:
+        continue
+    elif keys["left"]:
+        if camera_x >= camera_speed:
+            camera_x -= camera_speed
+        elif camera_x < camera_speed and camera_x > 0:
+            camera_x = 0
+    elif keys["right"]:
+        camera_x += camera_speed
 
     # Update Screen
     pygame.display.flip()
