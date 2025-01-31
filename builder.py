@@ -13,7 +13,7 @@ offset = screen_width / screen_size[0]
 print(offset)
 
 # Set The Grid Size
-grid_Size = 40 * offset
+grid_Size = int(40 * offset)
 
 default_screen_size = (int((screen_size[0] * .9 * offset) - (screen_size[0] * .9 * offset)%40), int(screen_size[1] * .9 * offset))
 screen = pygame.display.set_mode(default_screen_size)
@@ -70,6 +70,7 @@ keys = {"left": False, "right":False}
 
 # Sets Up The Hotbar
 hotbar = objects.hotbar(offset, default_screen_size[0], default_screen_size[1])
+current_Block = "red"
 
 # Main Loop
 while running:
@@ -86,12 +87,18 @@ while running:
         # Check To See If User Clicked
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1: 
-                mouse_Scalling = int(grid_Size)
                 mouse_Column, mouse_Row = event.pos  
                 mouse_Column += camera_x
-                print(f"Mouse clicked at: ({mouse_Column//mouse_Scalling}, {mouse_Row//mouse_Scalling})")
-                grid_Blocks[mouse_Row//mouse_Scalling][mouse_Column//mouse_Scalling] = objects.block("red", mouse_Scalling, mouse_Column//mouse_Scalling*mouse_Scalling, mouse_Row//mouse_Scalling*mouse_Scalling)
-
+                if mouse_Row < grid_Size * tilesHeight:
+                    print(f"Mouse clicked at: ({mouse_Column//grid_Size}, {mouse_Row//grid_Size})")
+                    grid_Blocks[mouse_Row//grid_Size][mouse_Column//grid_Size] = objects.block(current_Block, grid_Size, mouse_Column//grid_Size*grid_Size, mouse_Row//grid_Size*grid_Size)
+                else:
+                    for item in hotbar:
+                        if mouse_Column > item[1].x and mouse_Column < item[1].x + item[1].width and mouse_Row > item[1].y and mouse_Row < item[1].y + item[1].height:
+                            print(f"color now {item[2][:-4]}")
+                            current_Block = item[2][:-4]
+                            break
+                            
         # Ajust the camera
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
@@ -113,8 +120,11 @@ while running:
 
     # Creates The Hotbar
     for item in hotbar:
-        screen.blit(item, hotbar[item])
-        pygame.draw.rect(screen, (80, 80, 80), hotbar[item], 5)
+        screen.blit(item[0], item[1])
+        if item[2][:-4] == current_Block:
+            pygame.draw.rect(screen, (140, 140, 140), item[1], 10)
+        else:
+            pygame.draw.rect(screen, (60, 60, 60), item[1], 10)
 
     # Moves The Camera
     if keys["left"] and keys["right"]:
