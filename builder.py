@@ -85,20 +85,22 @@ while running:
             running = False
         
         # Check To See If User Clicked
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1: 
-                mouse_Column, mouse_Row = event.pos  
-                mouse_Column += camera_x
-                if mouse_Row < grid_Size * tilesHeight:
-                    print(f"Mouse clicked at: ({mouse_Column//grid_Size}, {mouse_Row//grid_Size})")
-                    grid_Blocks[mouse_Row//grid_Size][mouse_Column//grid_Size] = objects.block(current_Block, grid_Size, mouse_Column//grid_Size*grid_Size, mouse_Row//grid_Size*grid_Size)
-                else:
-                    for item in hotbar:
-                        if mouse_Column > item[1].x and mouse_Column < item[1].x + item[1].width and mouse_Row > item[1].y and mouse_Row < item[1].y + item[1].height:
-                            print(f"color now {item[2][:-4]}")
-                            current_Block = item[2][:-4]
-                            break
-                            
+    mouse_buttons = pygame.mouse.get_pressed()
+    
+    if mouse_buttons[0]:
+        if event.button == 1: 
+            mouse_Column, mouse_Row = pygame.mouse.get_pos()  
+            mouse_Column += camera_x
+            if mouse_Row < grid_Size * tilesHeight:
+                print(f"Mouse clicked at: ({mouse_Column//grid_Size}, {mouse_Row//grid_Size})")
+                grid_Blocks[mouse_Row//grid_Size][mouse_Column//grid_Size] = objects.block(current_Block, grid_Size, mouse_Column//grid_Size*grid_Size, mouse_Row//grid_Size*grid_Size)
+            else:
+                for item in hotbar:
+                    if mouse_Column > item[1].x and mouse_Column < item[1].x + item[1].width and mouse_Row > item[1].y and mouse_Row < item[1].y + item[1].height:
+                        print(f"color now {item[2][:-4]}")
+                        current_Block = item[2][:-4]
+                        break
+  
         # Ajust the camera
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
