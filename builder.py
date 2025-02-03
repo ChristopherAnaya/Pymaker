@@ -2,8 +2,6 @@ import pygame
 import json
 import objects
 
-
-
 # Initialize Pygame and Screen
 pygame.init()
 clock = pygame.time.Clock()
@@ -37,7 +35,7 @@ def create_Empty_Grid():
     return grid  
 
 #Saves A Grid To A Json File
-def Saved_Grid(grid, filename):
+def saved_Grid(grid, filename):
     with open(f"{filename}.json", "w") as file:
         json.dump(grid, file)
 
@@ -46,8 +44,7 @@ def load_grid(filename):
     with open(f"{filename}.json", "r") as file:
         return json.load(file)
 
-current_Grid = create_Empty_Grid()
-current_Grid[0][299] = "red"
+current_Grid = load_grid("test")
 
 #Turn The Grid Into Objects
 grid_Blocks = []
@@ -94,6 +91,7 @@ while running:
         if mouse_Row < grid_Size * tilesHeight:
             print(f"Mouse clicked at: ({mouse_Column//grid_Size}, {mouse_Row//grid_Size})")
             grid_Blocks[mouse_Row//grid_Size][mouse_Column//grid_Size] = objects.block(current_Block, grid_Size, mouse_Column//grid_Size*grid_Size, mouse_Row//grid_Size*grid_Size)
+            current_Grid[mouse_Row//grid_Size][mouse_Column//grid_Size] = current_Block
         else:
             for item in hotbar:
                 if mouse_Column - camera_x > item[1].x and mouse_Column - camera_x < item[1].x + item[1].width and mouse_Row > item[1].y and mouse_Row < item[1].y + item[1].height:
@@ -139,3 +137,5 @@ while running:
     clock.tick(60)
 
 pygame.quit()
+print(current_Grid[0][0])
+saved_Grid(current_Grid, "test")
