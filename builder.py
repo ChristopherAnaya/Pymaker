@@ -2,9 +2,12 @@ import pygame
 import json
 import objects
 
+
+
 # Initialize Pygame and Screen
 pygame.init()
 clock = pygame.time.Clock()
+running = True
 
 screen_info = pygame.display.Info()
 screen_width, screen_height = screen_info.current_w, screen_info.current_h
@@ -15,12 +18,9 @@ print(offset)
 # Set The Grid Size
 grid_Size = int(40 * offset)
 
-default_screen_size = (int((screen_size[0] * .9 * offset) - (screen_size[0] * .9 * offset)%40), int(screen_size[1] * .9 * offset))
+default_screen_size = (int((screen_size[0] * .9 * offset) - (screen_size[0] * .9 * offset) % grid_Size), int(screen_size[1] * .9 * offset))
 screen = pygame.display.set_mode(default_screen_size)
 print(default_screen_size)
-#1728, 972
-running = True
-fullscreen = False
 
 # Grid Size
 tilesWide = 300
@@ -70,7 +70,7 @@ keys = {"left": False, "right":False}
 
 # Sets Up The Hotbar
 hotbar = objects.hotbar(offset, default_screen_size[0], default_screen_size[1])
-current_Block = "red"
+current_Block = "black"
 
 # Main Loop
 while running:
@@ -88,31 +88,23 @@ while running:
     mouse_buttons = pygame.mouse.get_pressed()
     
     if mouse_buttons[0]:
-        if event.button == 1: 
-            mouse_Column, mouse_Row = pygame.mouse.get_pos()  
-            mouse_Column += camera_x
-            if mouse_Row < grid_Size * tilesHeight:
-                print(f"Mouse clicked at: ({mouse_Column//grid_Size}, {mouse_Row//grid_Size})")
-                grid_Blocks[mouse_Row//grid_Size][mouse_Column//grid_Size] = objects.block(current_Block, grid_Size, mouse_Column//grid_Size*grid_Size, mouse_Row//grid_Size*grid_Size)
-            else:
-                for item in hotbar:
-                    if mouse_Column > item[1].x and mouse_Column < item[1].x + item[1].width and mouse_Row > item[1].y and mouse_Row < item[1].y + item[1].height:
-                        print(f"color now {item[2][:-4]}")
-                        current_Block = item[2][:-4]
-                        break
+        mouse_Column, mouse_Row = pygame.mouse.get_pos()  
+        print(mouse_Column, mouse_Row)
+        mouse_Column += camera_x
+        if mouse_Row < grid_Size * tilesHeight:
+            print(f"Mouse clicked at: ({mouse_Column//grid_Size}, {mouse_Row//grid_Size})")
+            grid_Blocks[mouse_Row//grid_Size][mouse_Column//grid_Size] = objects.block(current_Block, grid_Size, mouse_Column//grid_Size*grid_Size, mouse_Row//grid_Size*grid_Size)
+        else:
+            for item in hotbar:
+                if mouse_Column - camera_x > item[1].x and mouse_Column - camera_x < item[1].x + item[1].width and mouse_Row > item[1].y and mouse_Row < item[1].y + item[1].height:
+                    print(f"color now {item[2][:-4]}")
+                    current_Block = item[2][:-4]
+                    break
   
         # Ajust the camera
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
-                keys["left"] = True
-            elif event.key == pygame.K_RIGHT:
-                keys["right"] = True
-        
-        elif event.type == pygame.KEYUP:
-            if event.key == pygame.K_LEFT:
-                keys["left"] = False
-            elif event.key == pygame.K_RIGHT:
-                keys["right"] = False
+    keys_pressed = pygame.key.get_pressed()
+    keys["left"] = keys_pressed[pygame.K_LEFT]
+    keys["right"] = keys_pressed[pygame.K_RIGHT]
 
     # Create Grid
     for row in range(tilesHeight):
@@ -130,7 +122,7 @@ while running:
 
     # Moves The Camera
     if keys["left"] and keys["right"]:
-        continue
+        pass
     elif keys["left"]:
         if camera_x >= camera_speed:
             camera_x -= camera_speed
