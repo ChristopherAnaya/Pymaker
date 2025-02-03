@@ -3,7 +3,7 @@ import json
 import objects
 import animations
 
-before = False
+"""before = False"""
 running = True
 pygame.init()
 clock = pygame.time.Clock()
@@ -46,12 +46,11 @@ tilesHeight = 20
 
 gravity = .1
 
-player_Speed_X = 2
-
 player_Speed_Y = 0
 
 walking_Frames = 0
 walking = False
+direction = "right"
 
 # Player Spawn
 spawn_y = -5
@@ -62,8 +61,9 @@ for x in world_Current:
 
 player = objects.player("idle", grid_Size, 0, spawn_y * grid_Size)
 
-keys = {"left": False, "right": False}
+keys = {"left": False, "right": False, "shift":False}
 
+frame_Speed = 20
 # Main Loop
 while running:
     screen.fill((255, 255, 255))
@@ -79,31 +79,48 @@ while running:
     keys_pressed = pygame.key.get_pressed()
     keys["left"] = keys_pressed[pygame.K_a]
     keys["right"] = keys_pressed[pygame.K_d]
-    if keys_pressed[pygame.K_SPACE]:
+    keys["shift"] = keys_pressed[pygame.K_LSHIFT]
+    """if keys_pressed[pygame.K_SPACE]:
         if before == False:
             player_Speed_Y -= 4.5
-            before = True
+            before = True"""
 
-
-    if keys["left"] and keys["right"]:
-        pass
-    elif keys["left"]:
-        if world_Current[player[1].y // grid_Size][int(player[1].x - player_Speed_X) // grid_Size] == "empty":
-            player[1].x -= player_Speed_X
-            walking = True
-        else:
-            walking = False
-            walking_Frames == 0
-    elif keys["right"]:
-        if world_Current[player[1].y // grid_Size][int(player[1].x + player_Speed_X + grid_Size) // grid_Size] == "empty":
-            player[1].x += player_Speed_X
-            walking = True
-        else:
-            walking = False
-            walking_Frames == 0
+    if keys["shift"]:
+        player_Speed_X = 6
     else:
-        walking = False
-        walking_Frames == 0
+        player_Speed_X = 3
+    for x in range(player_Speed_X):
+        if keys["left"] and keys["right"]:
+            pass
+        elif keys["left"]:
+            if world_Current[player[1].y // grid_Size][int(player[1].x - 1) // grid_Size] == "empty":
+                player[1].x -= 1
+                walking = True
+                direction = "left"
+            else:
+                walking = False
+                walking_Frames == 0
+                direction = "left"
+        elif keys["right"]:
+            if world_Current[player[1].y // grid_Size][int(player[1].x + 1 + grid_Size - 1) // grid_Size] == "empty":
+                player[1].x += 1
+                walking = True
+                direction = "right"
+            else:
+                walking = False
+                walking_Frames == 0
+                direction = "right"
+        else:
+            walking = False
+            walking_Frames == 0
+
+        if walking == True:
+            walking_Frames = (walking_Frames + 1) % (frame_Speed * 3)
+            player = animations.walking(f"walking_{walking_Frames//frame_Speed + 1}", grid_Size, player[1].x, player[1].y)
+        else:
+            player = objects.player("idle", grid_Size, player[1].x, player[1].y)
+        screen.blit(pygame.transform.flip(player[0], (True if direction == "left" else False) ,False), player[1])
+
 
     """player[1].y += player_Speed_Y
 
@@ -114,13 +131,8 @@ while running:
         before = False
     print(world_Current[int(player[1].y + grid_Size + player_Speed_Y) // grid_Size][player[1].x // grid_Size], [int(player[1].y + grid_Size + player_Speed_Y) // grid_Size],[player[1].x // grid_Size])
 """
-    if walking == True:
-        walking_Frames = (walking_Frames + 1) % 45
-        player = animations.walking(f"walking_{walking_Frames//15 + 1}", grid_Size, player[1].x, player[1].y)
-    else:
-        player = objects.player("idle", grid_Size, player[1].x, player[1].y)
-    screen.blit(player[0], player[1])
 
+    pygame.transform.flip
 
     pygame.display.flip()
     clock.tick(60)
