@@ -1,6 +1,8 @@
 import pygame
 import json
 import objects
+import animations
+
 before = False
 running = True
 pygame.init()
@@ -48,6 +50,9 @@ player_Speed_X = 2
 
 player_Speed_Y = 0
 
+walking_Frames = 0
+walking = False
+
 # Player Spawn
 spawn_y = -5
 for x in world_Current:
@@ -85,11 +90,22 @@ while running:
     elif keys["left"]:
         if world_Current[player[1].y // grid_Size][int(player[1].x - player_Speed_X) // grid_Size] == "empty":
             player[1].x -= player_Speed_X
+            walking = True
+        else:
+            walking = False
+            walking_Frames == 0
     elif keys["right"]:
         if world_Current[player[1].y // grid_Size][int(player[1].x + player_Speed_X + grid_Size) // grid_Size] == "empty":
             player[1].x += player_Speed_X
+            walking = True
+        else:
+            walking = False
+            walking_Frames == 0
+    else:
+        walking = False
+        walking_Frames == 0
 
-    player[1].y += player_Speed_Y
+    """player[1].y += player_Speed_Y
 
     if world_Current[int(player[1].y + grid_Size + player_Speed_Y) // grid_Size][player[1].x // grid_Size] == "empty":
         player_Speed_Y += gravity
@@ -97,8 +113,12 @@ while running:
         player_Speed_Y = 0
         before = False
     print(world_Current[int(player[1].y + grid_Size + player_Speed_Y) // grid_Size][player[1].x // grid_Size], [int(player[1].y + grid_Size + player_Speed_Y) // grid_Size],[player[1].x // grid_Size])
-
-
+"""
+    if walking == True:
+        walking_Frames = (walking_Frames + 1) % 45
+        player = animations.walking(f"walking_{walking_Frames//15 + 1}", grid_Size, player[1].x, player[1].y)
+    else:
+        player = objects.player("idle", grid_Size, player[1].x, player[1].y)
     screen.blit(player[0], player[1])
 
 
