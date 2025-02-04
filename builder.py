@@ -137,5 +137,3 @@ while running:
     clock.tick(60)
 
 pygame.quit()
-print(current_Grid[0][0])
-saved_Grid(current_Grid, "test")
