@@ -136,4 +136,5 @@ while running:
     pygame.display.flip()
     clock.tick(60)
 
-pygame.quit()
+
+saved_Grid(current_Grid, "test")

@@ -143,9 +143,17 @@ while running:
     
     if jumping:
         if world_Current[int((player[1].y + player_Speed_Y)//grid_Size + 1)][player[1].x//grid_Size] == "empty" and world_Current[int((player[1].y + player_Speed_Y)//grid_Size + 1)][(player[1].x + grid_Size - 1)//grid_Size] == "empty":
-            player[1].y += player_Speed_Y
-            if gained_height < 3.5 * grid_Size:
-                gained_height -= player_Speed_Y
+            if world_Current[int((player[1].y + player_Speed_Y) // 40)][player[1].x//grid_Size] != "empty" or world_Current[int((player[1].y + player_Speed_Y) // 40)][(player[1].x + grid_Size - 1)//grid_Size] != "empty":
+                if player_Speed_Y < 0:
+                    player_Speed_Y = 0
+                    gained_height = 3.5 * grid_Size
+                    space_held = False
+                    player[1].y = (int(player[1].y // grid_Size) * grid_Size)
+            else:
+                player[1].y += player_Speed_Y
+                if gained_height < 3.5 * grid_Size:
+                    gained_height -= player_Speed_Y
+                
         elif player[1].y % grid_Size != 0:
             player_Speed_Y = 0
             jumping = False
@@ -160,6 +168,11 @@ while running:
             player[1].y += player_Speed_Y
             player_Speed_Y += gravity
             able_Jump = False
+        elif player[1].y % grid_Size != 0:
+            player_Speed_Y = 0
+            jumping = False
+            able_Jump = True
+            player[1].y += grid_Size - player[1].y % grid_Size
         else:
             player_Speed_Y = 0
             able_Jump = True
