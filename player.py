@@ -43,8 +43,7 @@ for x in world_Current:
 tilesWide = 300
 tilesHeight = 20
 
-held_gravity = .4
-non_held_gravity = 2
+gravity = 2 * offset
 
 player_Speed_Y = 0
 
@@ -86,20 +85,22 @@ while running:
     keys["shift"] = keys_pressed[pygame.K_LSHIFT]
     keys["space"] = keys_pressed[pygame.K_SPACE]
     if keys_pressed[pygame.K_SPACE]:
-        if able_Jump == True:
-            player_Speed_Y -= 12
+        if jumping == False and space_held == False:
+            player_Speed_Y -= 12 * offset
             jumping = True
             space_held = True
-            able_Jump = False
+            gained_height = 0
     else:
         space_held = False
-    print(jumping, space_held, keys["space"])   
-    if player_Speed_Y < 0:
-        gravity = held_gravity if space_held else non_held_gravity 
+    if space_held == False and jumping == True or jumping == True and gained_height >= 3.5 * grid_Size:
+        player_Speed_Y += gravity
+        if player_Speed_Y > 12 * offset:
+            player_Speed_Y = 12 * offset
+
     if keys["shift"]:
-        player_Speed_X = 8
+        player_Speed_X = 8 * offset
     else:
-        player_Speed_X = 4
+        player_Speed_X = 4 * offset
     
     if keys["left"] and keys["right"]:
         pass
@@ -139,22 +140,21 @@ while running:
     else:
         player = objects.player("idle", grid_Size, player[1].x, player[1].y)
     screen.blit(pygame.transform.flip(player[0], (True if direction == "left" else False) ,False), player[1])
-
+    
     if jumping:
         if world_Current[int((player[1].y + player_Speed_Y)//grid_Size + 1)][player[1].x//grid_Size] == "empty" and world_Current[int((player[1].y + player_Speed_Y)//grid_Size + 1)][(player[1].x + grid_Size - 1)//grid_Size] == "empty":
             player[1].y += player_Speed_Y
-            player_Speed_Y += gravity
+            if gained_height < 3.5 * grid_Size:
+                gained_height -= player_Speed_Y
         elif player[1].y % grid_Size != 0:
             player_Speed_Y = 0
             jumping = False
             able_Jump = True
             player[1].y += grid_Size - player[1].y % grid_Size
-           
         else:
             player_Speed_Y = 0
             jumping = False
             able_Jump = True
-           
     else:
         if world_Current[int((player[1].y + player_Speed_Y)//grid_Size + 1)][player[1].x//grid_Size] == "empty" and world_Current[int((player[1].y + player_Speed_Y)//grid_Size + 1)][(player[1].x + grid_Size - 1)//grid_Size] == "empty":
             player[1].y += player_Speed_Y
@@ -163,15 +163,9 @@ while running:
         else:
             player_Speed_Y = 0
             able_Jump = True
-    if keys["space"] == True and jumping == False:
-        able_Jump = False
-    elif jumping == False:
-        able_Jump = True
-        space_held = False
         
-
     fps = clock.get_fps()
-    fps_text = font.render(f"FPS: {int(fps)}", True, (0, 0, 0))  # Black text
+    fps_text = font.render(f"FPS: {int(fps)}", True, (0, 0, 0))  
     screen.blit(fps_text, (10, 10))
 
     pygame.display.flip()
