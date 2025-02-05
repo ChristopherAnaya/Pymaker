@@ -2,7 +2,7 @@ import pygame
 import json
 import objects
 import animations
-
+pygame.font.init()
 running = True
 pygame.init()
 clock = pygame.time.Clock()
@@ -43,7 +43,8 @@ for x in world_Current:
 tilesWide = 300
 tilesHeight = 20
 
-gravity = .1
+held_gravity = .4
+non_held_gravity = 2
 
 player_Speed_Y = 0
 
@@ -53,7 +54,7 @@ direction = "right"
 frame_Speed = 10
 
 # Player Spawn
-spawn_y = -3
+spawn_y = -1
 for x in world_Current:
     if x[0] != "empty":
         break
@@ -63,7 +64,10 @@ player = objects.player("idle", grid_Size, 0, spawn_y * grid_Size)
 
 keys = {"left": False, "right": False, "shift":False, "space":False}
 jumping = False
+font = pygame.font.SysFont("Arial", 30)
 
+space_held = True
+able_Jump = True
 # Main Loop
 while running:
     screen.fill((255, 255, 255))
@@ -80,15 +84,22 @@ while running:
     keys["left"] = keys_pressed[pygame.K_a]
     keys["right"] = keys_pressed[pygame.K_d]
     keys["shift"] = keys_pressed[pygame.K_LSHIFT]
+    keys["space"] = keys_pressed[pygame.K_SPACE]
     if keys_pressed[pygame.K_SPACE]:
-        if jumping == False:
-            player_Speed_Y -= 4.5
+        if able_Jump == True:
+            player_Speed_Y -= 12
             jumping = True
-
-    if keys["shift"]:
-        player_Speed_X = 6
+            space_held = True
+            able_Jump = False
     else:
-        player_Speed_X = 3
+        space_held = False
+    print(jumping, space_held, keys["space"])   
+    if player_Speed_Y < 0:
+        gravity = held_gravity if space_held else non_held_gravity 
+    if keys["shift"]:
+        player_Speed_X = 8
+    else:
+        player_Speed_X = 4
     
     if keys["left"] and keys["right"]:
         pass
@@ -129,9 +140,6 @@ while running:
         player = objects.player("idle", grid_Size, player[1].x, player[1].y)
     screen.blit(pygame.transform.flip(player[0], (True if direction == "left" else False) ,False), player[1])
 
-    print(player[1].y)
-    print(player[1].y//grid_Size + 1)
-    print(world_Current[18][0])
     if jumping:
         if world_Current[int((player[1].y + player_Speed_Y)//grid_Size + 1)][player[1].x//grid_Size] == "empty" and world_Current[int((player[1].y + player_Speed_Y)//grid_Size + 1)][(player[1].x + grid_Size - 1)//grid_Size] == "empty":
             player[1].y += player_Speed_Y
@@ -139,15 +147,32 @@ while running:
         elif player[1].y % grid_Size != 0:
             player_Speed_Y = 0
             jumping = False
+            able_Jump = True
             player[1].y += grid_Size - player[1].y % grid_Size
+           
         else:
             player_Speed_Y = 0
             jumping = False
+            able_Jump = True
+           
     else:
-        if world_Current[int((player[1].y + player_Speed_Y)//grid_Size + 1)][player[1].x//grid_Size] != "empty" and world_Current[int((player[1].y + player_Speed_Y)//grid_Size + 1)][(player[1].x + grid_Size - 1)//grid_Size] != "empty":
-            pass
+        if world_Current[int((player[1].y + player_Speed_Y)//grid_Size + 1)][player[1].x//grid_Size] == "empty" and world_Current[int((player[1].y + player_Speed_Y)//grid_Size + 1)][(player[1].x + grid_Size - 1)//grid_Size] == "empty":
+            player[1].y += player_Speed_Y
+            player_Speed_Y += gravity
+            able_Jump = False
+        else:
+            player_Speed_Y = 0
+            able_Jump = True
+    if keys["space"] == True and jumping == False:
+        able_Jump = False
+    elif jumping == False:
+        able_Jump = True
+        space_held = False
+        
 
-    pygame.transform.flip
+    fps = clock.get_fps()
+    fps_text = font.render(f"FPS: {int(fps)}", True, (0, 0, 0))  # Black text
+    screen.blit(fps_text, (10, 10))
 
     pygame.display.flip()
     clock.tick(60)
