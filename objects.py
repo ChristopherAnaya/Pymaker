@@ -1,6 +1,7 @@
 import pygame
 import os
 
+sizes = {"brick": 1, "empty": 1, "ground": 1, "question": 1, "pipe": 2}
 
 def block(type, length, x, y):
     base_path = os.path.dirname(__file__)  
@@ -23,7 +24,7 @@ def player(type, length, x, y):
 
 def hotbar(offset, width, height):
     base_path = os.path.dirname(__file__)  
-    image_path = os.path.join(base_path, "object_Images")
+    image_path = os.path.join(base_path, "hotbar_Images")
     images = [f for f in os.listdir(image_path) if os.path.isfile(os.path.join(image_path, f))]
     for_Range = 12 if len(images) > 12 else len(images)
     final = []
@@ -35,6 +36,9 @@ def hotbar(offset, width, height):
         image_rect.topleft = ((width - 1200 * offset)/2 + i * 100 * offset, 20 * 40 * offset + (height - (20 * 40 * offset) - 100 * offset)/2)
         final.append([image, image_rect, images[i]])
     return final
+
+def pipe():
+    pass
 
 """class blocks:
     def __init__(self, type, collision):

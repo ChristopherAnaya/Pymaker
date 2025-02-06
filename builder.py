@@ -90,14 +90,27 @@ while running:
         mouse_Column, mouse_Row = pygame.mouse.get_pos()  
         print(mouse_Column, mouse_Row)
         mouse_Column += camera_x
+
         if mouse_Row < grid_Size * tilesHeight:
-            print(f"Mouse clicked at: ({mouse_Column//grid_Size}, {mouse_Row//grid_Size})")
-            grid_Blocks[mouse_Row//grid_Size][mouse_Column//grid_Size] = objects.block(current_Block, grid_Size, mouse_Column//grid_Size*grid_Size, mouse_Row//grid_Size*grid_Size)
-            current_Grid[mouse_Row//grid_Size][mouse_Column//grid_Size] = current_Block
+            print(f"Mouse clicked at: ({mouse_Column // grid_Size}, {mouse_Row // grid_Size})")
+            block_size = objects.sizes[current_Block]
+
+            if block_size == 1:
+                # Place a single block
+                grid_Blocks[mouse_Row // grid_Size][mouse_Column // grid_Size] = objects.block(current_Block, grid_Size, mouse_Column // grid_Size * grid_Size, mouse_Row // grid_Size * grid_Size)
+                current_Grid[mouse_Row // grid_Size][mouse_Column // grid_Size] = current_Block
+            else:
+                # Place a larger block (block_size > 1)
+                for x in range(block_size):
+                    for y in range(block_size):
+                        block_x = (mouse_Column // grid_Size) + x
+                        block_y = (mouse_Row // grid_Size) + y
+                        grid_Blocks[block_y][block_x] = objects.block(f"{current_Block}{x}{y}", grid_Size, block_x * grid_Size, block_y * grid_Size)
+                        current_Grid[block_y][block_x] = f"{current_Block}{x}{y}"
         else:
             for item in hotbar:
                 if mouse_Column - camera_x > item[1].x and mouse_Column - camera_x < item[1].x + item[1].width and mouse_Row > item[1].y and mouse_Row < item[1].y + item[1].height:
-                    print(f"color now {item[2][:-4]}")
+                    print(f"block now {item[2][:-4]}")
                     current_Block = item[2][:-4]
                     break
   
