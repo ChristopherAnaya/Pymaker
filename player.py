@@ -11,6 +11,7 @@ screen_info = pygame.display.Info()
 screen_width, screen_height = screen_info.current_w, screen_info.current_h
 screen_size = (1920, 1080) 
 offset = screen_width / screen_size[0]
+offset = 1
 print(offset)
 
 # Set The Grid Size
@@ -67,6 +68,7 @@ font = pygame.font.SysFont("Arial", 30)
 
 space_held = True
 able_Jump = True
+question_frames = 0
 # Main Loop
 while running:
     screen.fill((255, 255, 255))
@@ -77,7 +79,15 @@ while running:
     # Create Grid
     for row in range(tilesHeight):
         for col in range(tilesWide):
-            screen.blit(grid_Blocks[row][col][0], grid_Blocks[row][col][1])
+            if world_Current[row][col] == "question":
+                current_Object = animations.question_block_static(question_frames, col*grid_Size, row*grid_Size, grid_Size)
+                screen.blit(current_Object[0], current_Object[1]) 
+            elif world_Current[row][col] != "empty":
+                screen.blit(grid_Blocks[row][col][0], grid_Blocks[row][col][1])
+    
+    question_frames = (question_frames + 1) % 46
+
+    
 
     keys_pressed = pygame.key.get_pressed()
     keys["left"] = keys_pressed[pygame.K_a]
@@ -143,11 +153,10 @@ while running:
     
     if jumping:
         if world_Current[int((player[1].y + player_Speed_Y)//grid_Size + 1)][player[1].x//grid_Size] == "empty" and world_Current[int((player[1].y + player_Speed_Y)//grid_Size + 1)][(player[1].x + grid_Size - 1)//grid_Size] == "empty":
-            if world_Current[int((player[1].y + player_Speed_Y) // 40)][player[1].x//grid_Size] != "empty" or world_Current[int((player[1].y + player_Speed_Y) // 40)][(player[1].x + grid_Size - 1)//grid_Size] != "empty":
+            if world_Current[int((player[1].y + player_Speed_Y) // grid_Size)][player[1].x//grid_Size] != "empty" or world_Current[int((player[1].y + player_Speed_Y) // grid_Size)][(player[1].x + grid_Size - 1)//grid_Size] != "empty":
                 if player_Speed_Y < 0:
                     player_Speed_Y = 0
                     gained_height = 3.5 * grid_Size
-                    space_held = False
                     player[1].y = (int(player[1].y // grid_Size) * grid_Size)
             else:
                 player[1].y += player_Speed_Y
@@ -183,5 +192,3 @@ while running:
 
     pygame.display.flip()
     clock.tick(60)
-
-pygame.quit()

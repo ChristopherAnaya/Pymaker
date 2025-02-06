@@ -13,7 +13,7 @@ def block(type, length, x, y):
 
 def player(type, length, x, y):
     base_path = os.path.dirname(__file__)  
-    image_path = os.path.join(base_path, "player_Images", f"{type}.png")
+    image_path = os.path.join(base_path, "animation_Images", f"{type}.png")
     sprite = pygame.image.load(image_path)
     sprite = pygame.transform.scale(sprite, (length, length))
     block_rect = sprite.get_rect()
