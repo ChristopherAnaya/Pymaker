@@ -1,7 +1,8 @@
 import pygame
 import json
 import objects
-
+import os
+os.chdir(os.path.dirname(__file__))  
 # Initialize Pygame and Screen
 pygame.init()
 clock = pygame.time.Clock()
@@ -41,6 +42,7 @@ def saved_Grid(grid, filename):
 
 # Loads A Grid From A Json File
 def load_grid(filename):
+    print(os.getcwd())
     with open(f"{filename}.json", "r") as file:
         return json.load(file)
 

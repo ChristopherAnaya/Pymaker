@@ -2,6 +2,10 @@ import pygame
 import json
 import objects
 import animations
+import os
+
+
+os.chdir(os.path.dirname(__file__))  
 pygame.font.init()
 running = True
 pygame.init()
@@ -11,7 +15,6 @@ screen_info = pygame.display.Info()
 screen_width, screen_height = screen_info.current_w, screen_info.current_h
 screen_size = (1920, 1080) 
 offset = screen_width / screen_size[0]
-offset = 1
 print(offset)
 
 # Set The Grid Size
@@ -23,6 +26,7 @@ print(default_screen_size)
 
 # Load The World
 def load_grid(filename):
+    print()
     with open(f"{filename}.json", "r") as file:
         return json.load(file)
     
