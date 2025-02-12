@@ -1,18 +1,9 @@
-def multiply(expr1, expr2):
-    def parse(expr):
-        if 'x' in expr:
-            if '^' in expr:
-                coef, power = expr.split('x^')
-            else:
-                coef, power = expr[:-1], 1 
-            return int(coef) if coef else 1, int(power)  
-        return int(expr), 0 
+import math
+def how_many_pizzas(n):
+    pi = math.pi
+    eight = 64 * pi
+    print((pi * n**2 + 0.0001)//eight, pi * n**2 % eight, int(pi * n**2 % eight/(eight/8) + 0.000000001)%8)
+    return f'pizzas: {int((pi * n**2 + 0.0001)//eight)}, slices: {int(pi * n**2 % eight/(eight/8) + 0.000000001)%8}'
 
-    coef1, power1 = parse(expr1)
-    print(coef1, power1)
-    coef2, power2 = parse(expr2)
-    print(coef2, power2)
-    
-    print(f"{coef1 * coef2}x^{power1 + power2}" if power1 + power2 else str(coef1 * coef2))
-
-multiply("3x^2", "2")
+print(how_many_pizzas(801472))
+#pizzas: 801472, slices: 4
